@@ -16,7 +16,15 @@ resource "vault_kmip_secret_scope" "kmip_scope" {
   force = true
 }
 
+resource "time_sleep" "wait_for_scope" {
+  depends_on = [vault_kmip_secret_scope.kmip_scope]
+
+  create_duration = "10s"
+}
+
+
 resource "vault_kmip_secret_role" "kmip_role" {
+  depends_on = [vault_kmip_secret_scope.kmip_scope,time_sleep.wait_for_scope]
   path                     = vault_kmip_secret_scope.kmip_scope.path
   scope                    = vault_kmip_secret_scope.kmip_scope.scope
   role                     = var.kmip_role
